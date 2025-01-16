@@ -1,38 +1,38 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import Sidebar from "./Sidebar";
-import Header from "./Header";
-import AccountMenu from "./AccountMenu";
+import React from "react";
+import { signOut } from "firebase/auth";
+import { auth } from "../firebase";
 
-
-
-const Dashboard = ({ onLogout, children }) => {
-  const [showAccountMenu, setShowAccountMenu] = useState(false);
-
-  const toggleAccountMenu = () => setShowAccountMenu((prev) => !prev);
+const Dashboard = ({ onLogout }) => {
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      onLogout(); // Call parent function to update login state
+    } catch (err) {
+      console.error("Logout failed:", err);
+    }
+  };
 
   return (
     <div className="flex h-screen">
-      <Sidebar>
-        <ul>
-          <li className="p-4 hover:bg-gray-700 cursor-pointer">
-            <Link to="/">Landing Pages</Link>
-          </li>
-          <li className="p-4 hover:bg-gray-700 cursor-pointer">
-            <Link to="/forms">Forms</Link>
-          </li>
-          <li className="p-4 hover:bg-gray-700 cursor-pointer">
-            <Link to="/analytics">Analytics</Link>
-          </li>
-          <li className="p-4 hover:bg-gray-700 cursor-pointer">
-            <Link to="/help">Help</Link>
-          </li>
-        </ul>
-      </Sidebar>
-      <div className="flex-1 bg-gray-100 relative">
-        <Header onToggleAccountMenu={toggleAccountMenu} />
-        {showAccountMenu && <AccountMenu onLogout={onLogout} />}
-        <main className="p-6">{children}</main>
+      {/* Sidebar can be imported and used here */}
+      <div className="w-64 bg-gray-800 text-white">
+        <h1 className="text-2xl font-bold p-4">Dashboard</h1>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 bg-gray-100">
+        <header className="bg-white shadow p-4 flex justify-between items-center">
+          <h2 className="text-xl font-bold">Welcome to the Dashboard</h2>
+          <button
+            onClick={handleLogout}
+            className="bg-red-500 text-white px-4 py-2 rounded shadow hover:bg-red-400"
+          >
+            Logout
+          </button>
+        </header>
+        <main className="p-6">
+          <p>This is where your dashboard content will go.</p>
+        </main>
       </div>
     </div>
   );

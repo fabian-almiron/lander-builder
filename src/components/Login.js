@@ -1,21 +1,31 @@
 import React, { useState } from "react";
+import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { auth, googleProvider } from "../firebase";
 
 const Login = ({ onLogin }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
 
-    const mockUser = {
-      email: "fabian.e.almiron@gmail.com",
-      password: "Server.1234!!",
-    };
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      onLogin(); // Call parent function to update login state
+    } catch (err) {
+      setError("Invalid email or password. Please try again.");
+    }
+  };
 
-    if (email === mockUser.email && password === mockUser.password) {
-      onLogin();
-    } else {
-      alert("Invalid email or password. Please try again.");
+  const handleGoogleSignIn = async () => {
+    try {
+      await signInWithPopup(auth, googleProvider);
+      onLogin(); // Call parent function to update login state
+    } catch (err) {
+      setError("Google sign-in failed. Please try again.");
+      console.error(err);
     }
   };
 
@@ -23,6 +33,7 @@ const Login = ({ onLogin }) => {
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
       <div className="bg-white shadow-lg rounded-lg p-6 max-w-sm w-full">
         <h1 className="text-2xl font-bold text-gray-800 text-center">Login</h1>
+        {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
         <form onSubmit={handleSubmit} className="mt-6">
           <div className="mb-4">
             <label htmlFor="email" className="block text-sm font-medium text-gray-700">
@@ -59,6 +70,14 @@ const Login = ({ onLogin }) => {
             Log In
           </button>
         </form>
+        <div className="mt-6">
+          <button
+            onClick={handleGoogleSignIn}
+            className="w-full bg-red-500 text-white py-2 px-4 rounded-lg shadow hover:bg-red-400 focus:outline-none focus:ring-2 focus:ring-red-500"
+          >
+            Sign in with Google
+          </button>
+        </div>
       </div>
     </div>
   );
