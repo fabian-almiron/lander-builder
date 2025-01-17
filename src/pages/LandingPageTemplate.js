@@ -45,6 +45,10 @@ const LandingPageTemplate = () => {
     fetchPage();
   }, [id]);
 
+  if (!page) {
+    return <div>Loading...</div>;
+  }
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -52,21 +56,15 @@ const LandingPageTemplate = () => {
 
   const handleSaveChanges = async () => {
     try {
-      const docRef = doc(db, "landingPages", id);
-      await updateDoc(docRef, formData);
-      setPage({ ...formData, id });
+      await updateDoc(doc(db, "landingPages", id), formData);
       setIsEditing(false);
     } catch (error) {
-      console.error("Error updating document: ", error);
+      console.error("Error saving changes: ", error);
     }
   };
 
-  if (!page) {
-    return <div>Loading...</div>;
-  }
-
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900">
+    <div className="min-h-screen bg-gray-50 text-gray-900 ">
       <section className="px-2 py-32 bg-white md:px-0">
         <div className="container items-center max-w-6xl px-8 mx-auto xl:px-5">
           <div className="flex flex-wrap items-center sm:-mx-3">

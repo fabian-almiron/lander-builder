@@ -13,13 +13,12 @@ import LandingPageTemplate from "./pages/LandingPageTemplate";
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  // Monitor authentication state
   React.useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setIsLoggedIn(!!user);
     });
 
-    return () => unsubscribe(); // Cleanup subscription on unmount
+    return () => unsubscribe();
   }, []);
 
   return (
@@ -27,14 +26,14 @@ function App() {
       <div className="min-h-screen">
         {isLoggedIn ? (
           <Dashboard onLogout={() => setIsLoggedIn(false)}>
-            <Routes>
-              <Route path="/" element={<LandingPages />} />
-              <Route path="/landing-page/:id" element={<LandingPageTemplate />} />
-              <Route path="/forms" element={<Forms />} />
-              <Route path="/analytics" element={<Analytics />} />
-              <Route path="/help" element={<Help />} />
-            </Routes>
-          </Dashboard>
+          <Routes>
+            <Route path="/" element={<LandingPages />} />
+            <Route path="/landing-page/:id" element={<LandingPageTemplate />} />
+            <Route path="/forms" element={<Forms />} />
+            <Route path="/analytics" element={<Analytics />} />
+            <Route path="/help" element={<Help />} />
+          </Routes>
+        </Dashboard>
         ) : (
           <Login onLogin={() => setIsLoggedIn(true)} />
         )}

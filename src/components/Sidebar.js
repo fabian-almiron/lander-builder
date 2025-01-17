@@ -4,7 +4,7 @@ import { ReactComponent as Logo } from "../assets/logo.svg";
 
 const Sidebar = () => {
   return (
-    <div className="w-64 bg-gray-800 text-white flex flex-col justify-between">
+    <div className="w-64 bg-gray-800 text-white flex flex-col justify-between fixed h-full">
       <div>
         <h1 className="text-2xl font-bold p-4">
           <Logo className="w-6 h-6 mr-2" />
