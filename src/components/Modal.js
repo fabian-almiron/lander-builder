@@ -3,8 +3,17 @@ import React from "react";
 const Modal = ({ isOpen, onClose, children }) => {
   if (!isOpen) return null;
 
+  const handleOverlayClick = (e) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+    <div
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+      onClick={handleOverlayClick} // Add this line
+    >
       <div className="bg-white p-6 rounded-lg shadow-lg">
         <button
           onClick={onClose}

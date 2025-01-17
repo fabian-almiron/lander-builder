@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { collection, addDoc, getDocs } from "firebase/firestore";
+import { collection, addDoc, getDocs, doc, deleteDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import Modal from "../components/Modal";
+import { useNavigate } from "react-router-dom";
 
 const LandingPages = () => {
   const [landingPages, setLandingPages] = useState([]);
   const [newPage, setNewPage] = useState({ clientName: "", url: "", formSubmissions: 0 });
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [pageToDelete, setPageToDelete] = useState(null);
+  const [deleteConfirmation, setDeleteConfirmation] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchPages = async () => {
@@ -30,6 +35,21 @@ const LandingPages = () => {
       setIsModalOpen(false);
     } catch (err) {
       console.error("Error adding document: ", err);
+    }
+  };
+
+  const handleDeletePage = async () => {
+    if (deleteConfirmation === `DELETE ${pageToDelete.clientName}`) {
+      try {
+        await deleteDoc(doc(db, "landingPages", pageToDelete.id));
+        setLandingPages(landingPages.filter(page => page.id !== pageToDelete.id));
+        setDeleteModalOpen(false);
+        setDeleteConfirmation("");
+      } catch (err) {
+        console.error("Error deleting document: ", err);
+      }
+    } else {
+      alert("Confirmation text does not match.");
     }
   };
 
@@ -73,11 +93,16 @@ const LandingPages = () => {
             <th className="p-4 text-left">Client Name</th>
             <th className="p-4 text-left">URL</th>
             <th className="p-4 text-left">Form Submissions</th>
+            <th className="p-4 text-left">Actions</th>
           </tr>
         </thead>
         <tbody>
           {landingPages.map((page) => (
-            <tr key={page.id} className="border-b hover:bg-gray-100">
+            <tr
+              key={page.id}
+              className="border-b hover:bg-gray-100 cursor-pointer"
+              onClick={() => navigate(`/landing-page/${page.id}`)}
+            >
               <td className="p-4">{page.clientName}</td>
               <td className="p-4">
                 <a
@@ -90,10 +115,40 @@ const LandingPages = () => {
                 </a>
               </td>
               <td className="p-4">{page.formSubmissions}</td>
+              <td className="p-4">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setPageToDelete(page);
+                    setDeleteModalOpen(true);
+                  }}
+                  className="bg-red-500 text-white py-1 px-3 rounded"
+                >
+                  Delete
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>
       </table>
+
+      <Modal isOpen={deleteModalOpen} onClose={() => setDeleteModalOpen(false)}>
+        <h2 className="text-xl font-bold mb-4">Confirm Deletion</h2>
+        <p>Are you sure you want to delete this page?</p>
+        <p>Type "DELETE {pageToDelete?.clientName}" to confirm.</p>
+        <input
+          type="text"
+          value={deleteConfirmation}
+          onChange={(e) => setDeleteConfirmation(e.target.value)}
+          className="p-2 border border-gray-300 rounded mt-2"
+        />
+        <button
+          onClick={handleDeletePage}
+          className="bg-red-500 text-white py-2 px-4 rounded mt-4"
+        >
+          Confirm Delete
+        </button>
+      </Modal>
     </div>
   );
 };
